@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sổ Cái: Chế Độ Làm Cái</title>
+    <title>Sổ Cái: Chế Độ Làm Cái v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -59,40 +59,9 @@
             cursor: pointer; color: var(--text-main);
         }
 
-        /* SETUP SCREEN */
-        .setup-screen { display: none; flex-direction: column; gap: 15px; }
-        .setup-screen.active { display: flex; }
-
-        .setup-row { display: flex; gap: 10px; align-items: center; }
-        
-        /* Custom Radio for Host Selection */
-        .host-radio {
-            appearance: none; width: 24px; height: 24px;
-            border: 2px solid #555; border-radius: 50%;
-            display: grid; place-content: center; cursor: pointer;
-        }
-        .host-radio::before {
-            content: "🎩"; font-size: 14px; opacity: 0; transform: scale(0); transition: 0.2s;
-        }
-        .host-radio:checked { border-color: var(--accent-gold); background: rgba(255, 215, 0, 0.1); }
-        .host-radio:checked::before { opacity: 1; transform: scale(1); }
-
-        .setup-input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid transparent; background: var(--input-bg); color: var(--text-main); font-size: 1rem;}
-        .btn-remove { background: var(--accent-red); color: white; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
-        .btn-add { background: var(--input-bg); color: var(--accent-blue); padding: 12px; border: 2px dashed var(--accent-blue); border-radius: 8px; cursor: pointer; font-weight: 600;}
-
-        /* GAME SCREEN */
-        .game-screen { display: none; flex-direction: column; gap: 20px;}
-        .game-screen.active { display: flex; }
-
         /* DASHBOARD */
-        .dealer-section {
-            margin-bottom: 15px;
-        }
-        
-        .players-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-        }
+        .dealer-section { margin-bottom: 15px; }
+        .players-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
         .player-card {
             background: var(--card-bg); border-radius: 12px; padding: 12px;
@@ -100,8 +69,14 @@
             position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid transparent;
         }
+        
+        /* Paused State */
+        .player-card.paused { opacity: 0.6; background: rgba(0,0,0,0.2); border: 1px dashed #555; }
+        .paused-badge {
+            position: absolute; bottom: 5px; background: #333; color: #fff;
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; pointer-events: none;
+        }
 
-        /* DEALER CARD STYLE */
         .player-card.is-dealer {
             border: 2px solid var(--accent-gold);
             background: linear-gradient(to bottom right, var(--card-bg), rgba(255, 215, 0, 0.05));
@@ -116,7 +91,7 @@
 
         .player-name { font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; color: var(--text-main); opacity: 0.9;}
         .player-score { font-size: 1.6rem; font-weight: 700; }
-        .is-dealer .player-score { font-size: 2.2rem; } /* Dealer score bigger */
+        .is-dealer .player-score { font-size: 2.2rem; }
 
         .score-pos { color: var(--accent-green); }
         .score-neg { color: var(--accent-red); }
@@ -142,20 +117,42 @@
         .btn-secondary { flex: 1; padding: 12px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-weight: 600; cursor: pointer;}
         .btn-primary { width: 100%; padding: 15px; border-radius: 10px; background: var(--accent-green); color: white; font-weight: bold; border: none; font-size: 1rem; cursor: pointer; margin-top: 15px;}
 
-        /* CHANGE DEALER MODAL */
+        /* MODALS (Settings & Change Dealer) */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 1000;
+            background: rgba(0,0,0,0.85); z-index: 1000;
             justify-content: center; align-items: center;
         }
         .modal.open { display: flex; }
         .modal-content {
             background: var(--card-bg); padding: 20px; border-radius: 12px;
-            width: 80%; max-width: 300px;
+            width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
         }
         .modal-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-        .modal-btn { padding: 10px; background: var(--input-bg); border: none; color: var(--text-main); border-radius: 8px; cursor: pointer; text-align: left;}
-        .modal-btn:hover { background: var(--accent-blue); color: white; }
+        
+        /* Settings List Styles */
+        .setting-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .setting-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); }
+        .btn-status {
+            width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer;
+            font-size: 1.2rem; background: var(--input-bg); display: flex; align-items: center; justify-content: center;
+        }
+        .btn-status.active { border: 1px solid var(--accent-green); color: var(--accent-green); background: rgba(64, 192, 87, 0.15); }
+        .btn-status.inactive { border: 1px solid #555; color: #777; opacity: 0.6; }
+        
+        .btn-remove { background: var(--accent-red); color: white; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
+        .btn-add { width: 100%; background: var(--input-bg); color: var(--accent-blue); padding: 10px; border: 1px dashed var(--accent-blue); border-radius: 8px; cursor: pointer; margin-top: 10px;}
+
+        /* HISTORY */
+        .history-section { margin-top: 30px; }
+        .history-list { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; }
+        .history-item {
+            background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 8px;
+            font-size: 0.9rem; border-left: 3px solid var(--accent-blue);
+        }
+        .h-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; }
+        .h-detail { font-size: 0.85rem; color: #888; display: flex; flex-wrap: wrap; gap: 8px; }
+        .h-tag { background: var(--input-bg); padding: 2px 6px; border-radius: 4px; }
 
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -171,22 +168,11 @@
 <div class="container">
     <div class="header">
         <a href="https://thanhnhut201294.github.io/ghidiem" class="btn-icon">🏠</a>
-        <h1>Chế Độ Làm Cái</h1>
+        <h1>Chế Độ Làm Cái v2</h1>
         <button class="btn-icon" onclick="toggleTheme()">🌓</button>
     </div>
 
-    <div id="setup-screen" class="setup-screen active">
-        <h2 style="text-align: center; margin-bottom: 10px;">Thiết lập bàn chơi</h2>
-        <p style="text-align: center; color: #888; font-size: 0.85rem; margin-top: -10px;">Chọn ai là Cái (🎩) đầu tiên</p>
-        
-        <div id="setup-list">
-            </div>
-        <button class="btn-add" onclick="addSetupRow()">+ Thêm người chơi</button>
-        <button class="btn-primary" onclick="startGame()">BẮT ĐẦU</button>
-    </div>
-
-    <div id="game-screen" class="game-screen">
-        
+    <div id="game-container">
         <div id="dashboard">
             <div id="dealer-area" class="dealer-section"></div>
             <div id="players-area" class="players-grid"></div>
@@ -200,14 +186,29 @@
         </div>
 
         <div class="action-bar">
-            <button class="btn-secondary" onclick="undo()">↩️ Hoàn tác</button>
+            <button class="btn-secondary" onclick="openSettings()">⚙️ Cài đặt</button>
             <button class="btn-secondary" style="color: var(--accent-gold)" onclick="openChangeDealer()">🎩 Đổi Cái</button>
             <button class="btn-secondary" style="color: var(--accent-red)" onclick="resetGame()">🗑️ Reset</button>
         </div>
+        
+        <div style="text-align: right; margin-top: 5px;">
+             <button style="background:none; border:none; color: #888; text-decoration: underline; cursor: pointer; font-size: 0.8rem" onclick="undo()">↩️ Hoàn tác ván trước</button>
+        </div>
 
-         <div style="margin-top: 20px; font-size: 0.8rem; color: #666; text-align: center;">
-            <span id="round-counter">Ván: 0</span>
-         </div>
+        <div class="history-section">
+            <h3 style="font-size: 1rem; margin-bottom: 10px; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px;">Lịch sử điểm</h3>
+            <ul id="history-list" class="history-list"></ul>
+        </div>
+    </div>
+</div>
+
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <h3>Quản lý người chơi</h3>
+        <p style="font-size: 0.8rem; color: #888;">🟢: Đang chơi | ⚫: Tạm nghỉ</p>
+        <div id="settings-list"></div>
+        <button class="btn-add" onclick="addPlayer()">+ Thêm người chơi</button>
+        <button class="btn-primary" onclick="closeSettings()">Lưu & Đóng</button>
     </div>
 </div>
 
@@ -219,105 +220,57 @@
     </div>
 </div>
 
-<div id="toast" class="toast">Đã lưu!</div>
+<div id="toast" class="toast">Thông báo</div>
 
 <script>
     // --- STATE ---
     let state = {
-        isGameStarted: false,
-        players: ['', '', '', '', ''], // Mặc định 5 người
-        scores: [0, 0, 0, 0, 0],
-        dealerIndex: 0, // Index của người làm Cái
+        players: ['Người 1', 'Người 2', 'Người 3', 'Người 4'], 
+        scores: [0, 0, 0, 0],
+        isActive: [true, true, true, true], // Trạng thái chơi/nghỉ
+        dealerIndex: 0, 
         history: [] 
     };
 
     // --- INIT ---
     function init() {
-        const saved = localStorage.getItem('dealer_game_state');
+        const saved = localStorage.getItem('dealer_v2_state');
         if (saved) {
-            state = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            state = { ...state, ...parsed };
+            // Data migration check
+            if (!state.isActive || state.isActive.length !== state.players.length) {
+                state.isActive = state.players.map(() => true);
+            }
         }
-        
-        if (state.isGameStarted) {
-            showGameScreen();
-        } else {
-            renderSetup();
-        }
+        renderGame();
         checkTheme();
     }
 
-    // --- SETUP ---
-    function renderSetup() {
-        const container = document.getElementById('setup-list');
-        container.innerHTML = '';
-        state.players.forEach((name, index) => {
-            const div = document.createElement('div');
-            div.className = 'setup-row';
-            div.innerHTML = `
-                <input type="radio" name="host-select" class="host-radio" 
-                    ${index === state.dealerIndex ? 'checked' : ''} 
-                    onchange="state.dealerIndex = ${index}">
-                <input type="text" class="setup-input" placeholder="Tên người chơi ${index + 1}" 
-                    value="${name}" onchange="updateName(${index}, this.value)">
-                <button class="btn-remove" onclick="removeSetupRow(${index})">✕</button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function addSetupRow() {
-        state.players.push('');
-        state.scores.push(0);
-        renderSetup();
-    }
-
-    function removeSetupRow(index) {
-        if (state.players.length <= 2) {
-            showToast("Cần tối thiểu 2 người!");
-            return;
-        }
-        state.players.splice(index, 1);
-        state.scores.splice(index, 1);
-        if (state.dealerIndex >= index) state.dealerIndex = 0; // Reset dealer if removed
-        renderSetup();
-    }
-
-    function updateName(index, val) {
-        state.players[index] = val;
-    }
-
-    function startGame() {
-        // Default names
-        state.players = state.players.map((p, i) => p.trim() || `Người ${i + 1}`);
-        state.isGameStarted = true;
-        saveState();
-        showGameScreen();
-    }
-
-    // --- GAME LOGIC ---
-    function showGameScreen() {
-        document.getElementById('setup-screen').classList.remove('active');
-        document.getElementById('game-screen').classList.add('active');
+    // --- RENDER GAME LOOP ---
+    function renderGame() {
         renderDashboard();
         renderInputs();
-        updateCounter();
+        renderHistory();
     }
 
     function renderDashboard() {
         const dealerArea = document.getElementById('dealer-area');
         const playersArea = document.getElementById('players-area');
-        
         dealerArea.innerHTML = '';
         playersArea.innerHTML = '';
 
         state.players.forEach((name, i) => {
             const score = state.scores[i];
             const isDealer = (i === state.dealerIndex);
+            const isActive = state.isActive[i];
             
             let colorClass = score > 0 ? 'score-pos' : (score < 0 ? 'score-neg' : 'score-neutral');
+            
             const html = `
-                <div class="player-card ${isDealer ? 'is-dealer' : ''}">
+                <div class="player-card ${isDealer ? 'is-dealer' : ''} ${!isActive ? 'paused' : ''}">
                     ${isDealer ? '<div class="dealer-badge">🎩 NHÀ CÁI</div>' : ''}
+                    ${!isActive && !isDealer ? '<div class="paused-badge">Tạm nghỉ</div>' : ''}
                     <div class="player-name">${name}</div>
                     <div class="player-score ${colorClass}">${score > 0 ? '+' : ''}${score}</div>
                 </div>
@@ -335,9 +288,12 @@
         const list = document.getElementById('input-list');
         list.innerHTML = '';
 
+        // Chỉ hiện ô nhập cho: Không phải Cái VÀ Đang Active
+        let hasActivePlayer = false;
+
         state.players.forEach((name, i) => {
-            // Không hiện ô nhập cho nhà Cái (vì Cái tự tính)
-            if (i === state.dealerIndex) return;
+            if (i === state.dealerIndex || !state.isActive[i]) return;
+            hasActivePlayer = true;
 
             const div = document.createElement('div');
             div.className = 'input-row';
@@ -348,58 +304,90 @@
             list.appendChild(div);
         });
         
-        // Focus vào ô input đầu tiên
-        const firstInput = document.querySelector('.input-field');
-        if(firstInput) firstInput.focus();
+        if (!hasActivePlayer) {
+            list.innerHTML = '<p style="text-align:center; color:#666">Chưa có người chơi (hoặc đang tạm nghỉ hết).</p>';
+        }
     }
 
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        const historyRev = [...state.history].reverse();
+        
+        if (historyRev.length === 0) {
+            list.innerHTML = '<li style="text-align:center; color:#666; font-size:0.8rem; padding:10px;">Chưa có dữ liệu ván đấu</li>';
+            return;
+        }
+
+        list.innerHTML = historyRev.map((h, i) => {
+            const roundNum = state.history.length - i;
+            const dealerName = state.players[h.dealerIndex] || "Unknown";
+            const dealerChange = h.changes[h.dealerIndex];
+            
+            // Build detail string for players who played
+            let detailsHTML = '';
+            h.changes.forEach((val, idx) => {
+                if (idx !== h.dealerIndex && val !== 0) {
+                    const pName = state.players[idx] || "Deleted";
+                    const color = val > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                    detailsHTML += `<span class="h-tag" style="color:${color}">${pName}: ${val > 0 ? '+'+val : val}</span>`;
+                }
+            });
+
+            const dealerColor = dealerChange > 0 ? 'var(--accent-green)' : (dealerChange < 0 ? 'var(--accent-red)' : '#888');
+
+            return `
+                <li class="history-item">
+                    <div class="h-header">
+                        <span>#${roundNum} - Cái: ${dealerName}</span>
+                        <span style="color:${dealerColor}">${dealerChange > 0 ? '+'+dealerChange : dealerChange}</span>
+                    </div>
+                    <div class="h-detail">
+                        ${detailsHTML || '<span style="font-style:italic">Không có phát sinh điểm</span>'}
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+
+    // --- LOGIC ---
     function submitRound() {
         let playerInputsSum = 0;
         let roundChanges = new Array(state.players.length).fill(0);
         let hasInput = false;
 
-        // 1. Duyệt qua tất cả người chơi (trừ cái) để lấy điểm
         state.players.forEach((_, i) => {
-            if (i === state.dealerIndex) return;
+            if (i === state.dealerIndex || !state.isActive[i]) return;
 
             const inputEl = document.getElementById(`input-${i}`);
-            const val = parseInt(inputEl.value);
-
-            if (!isNaN(val)) {
-                hasInput = true;
-                // Cập nhật điểm người chơi
-                state.scores[i] += val;
-                roundChanges[i] = val;
-                
-                // Cộng dồn để tính cho cái (Tổng cái ăn/thua = ngược lại tổng con)
-                playerInputsSum += val;
-                
-                // Clear input
-                inputEl.value = '';
+            if (inputEl) {
+                const val = parseInt(inputEl.value);
+                if (!isNaN(val)) {
+                    hasInput = true;
+                    state.scores[i] += val;
+                    roundChanges[i] = val;
+                    playerInputsSum += val;
+                    inputEl.value = '';
+                }
             }
         });
 
         if (!hasInput) return;
 
-        // 2. Tính điểm cho cái
-        // Nếu các con thắng tổng 10đ -> Cái thua 10đ (-10)
-        // Nếu các con thua tổng -5đ -> Cái thắng 5đ (+5)
+        // Tính điểm cái: Cái đối ứng với tổng con
         const dealerChange = -playerInputsSum;
         state.scores[state.dealerIndex] += dealerChange;
         roundChanges[state.dealerIndex] = dealerChange;
 
-        // 3. Lưu lịch sử
+        // Lưu lịch sử snapshot (Copy mảng changes để tránh lỗi tham chiếu khi undo)
         state.history.push({
-            dealerIndex: state.dealerIndex, // Lưu lại ai làm cái ván này
-            changes: roundChanges
+            dealerIndex: state.dealerIndex,
+            changes: [...roundChanges]
         });
 
         saveState();
-        renderDashboard();
-        showToast("Đã cập nhật điểm!");
-        updateCounter();
+        renderGame();
+        showToast("Đã cập nhật!");
         
-        // Giữ focus
         const firstInput = document.querySelector('.input-field');
         if(firstInput) firstInput.focus();
     }
@@ -408,35 +396,122 @@
         if (state.history.length === 0) return;
         const lastRound = state.history.pop();
 
-        // Hoàn tác điểm
+        // Kiểm tra độ dài mảng history cũ với số người chơi hiện tại
+        // Nếu số lượng người chơi bị thay đổi (xóa bớt) thì undo có thể bị lệch index
+        // Ở đây ta chấp nhận rủi ro hoặc chỉ undo cho những index còn tồn tại
         lastRound.changes.forEach((change, i) => {
-            state.scores[i] -= change;
+            if (state.scores[i] !== undefined) {
+                state.scores[i] -= change;
+            }
         });
 
         saveState();
-        renderDashboard();
-        updateCounter();
+        renderGame();
         showToast("↩️ Đã hoàn tác");
     }
 
     function resetGame() {
-        if (confirm("Xóa hết điểm và chơi lại?")) {
+        if (confirm("Xóa hết điểm và lịch sử?")) {
             state.scores = state.players.map(() => 0);
             state.history = [];
             saveState();
-            renderDashboard();
-            updateCounter();
+            renderGame();
         }
     }
 
-    // --- CHANGE DEALER LOGIC ---
+    // --- SETTINGS (ADD/REMOVE/PAUSE) ---
+    function openSettings() {
+        renderSettingsList();
+        document.getElementById('settings-modal').classList.add('open');
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-modal').classList.remove('open');
+        
+        // Safety check: Nếu Dealer bị Pause, bắt buộc đổi Dealer
+        if (!state.isActive[state.dealerIndex]) {
+            alert("Người làm Cái đang tạm nghỉ. Vui lòng chọn Cái mới!");
+            openChangeDealer();
+            return;
+        }
+        
+        saveState();
+        renderGame();
+    }
+
+    function renderSettingsList() {
+        const list = document.getElementById('settings-list');
+        list.innerHTML = '';
+        state.players.forEach((name, i) => {
+            const isActive = state.isActive[i];
+            const div = document.createElement('div');
+            div.className = 'setting-row';
+            div.innerHTML = `
+                <button class="btn-status ${isActive ? 'active' : 'inactive'}" onclick="toggleActive(${i})">
+                    ${isActive ? '🟢' : '⚫'}
+                </button>
+                <input type="text" class="setting-input" value="${name}" onchange="updateName(${i}, this.value)">
+                <button class="btn-remove" onclick="removePlayer(${i})">✕</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function toggleActive(index) {
+        // Không cho phép pause người đang làm cái (UX choice: phải đổi cái trước)
+        if (index === state.dealerIndex && state.isActive[index]) {
+            alert("Không thể tạm nghỉ người đang làm Cái. Hãy đổi Cái trước!");
+            return;
+        }
+        state.isActive[index] = !state.isActive[index];
+        renderSettingsList();
+    }
+
+    function updateName(index, val) {
+        state.players[index] = val;
+    }
+
+    function addPlayer() {
+        state.players.push(`Người ${state.players.length + 1}`);
+        state.scores.push(0);
+        state.isActive.push(true);
+        renderSettingsList();
+    }
+
+    function removePlayer(index) {
+        if (state.players.length <= 2) {
+            alert("Cần tối thiểu 2 người chơi!");
+            return;
+        }
+        if (index === state.dealerIndex) {
+            alert("Người này đang làm Cái. Vui lòng đổi Cái trước khi xóa!");
+            return;
+        }
+        
+        if (confirm("Xóa người chơi này? Điểm số sẽ mất.")) {
+            state.players.splice(index, 1);
+            state.scores.splice(index, 1);
+            state.isActive.splice(index, 1);
+            
+            // Adjust dealer index if needed
+            if (state.dealerIndex > index) state.dealerIndex--;
+            
+            renderSettingsList();
+        }
+    }
+
+    // --- CHANGE DEALER ---
     function openChangeDealer() {
         const list = document.getElementById('dealer-select-list');
-        list.innerHTML = state.players.map((name, i) => `
-            <button class="modal-btn" onclick="confirmChangeDealer(${i})">
-                ${i === state.dealerIndex ? '🎩' : '👤'} ${name}
-            </button>
-        `).join('');
+        // Chỉ hiện những người đang Active để chọn làm cái
+        list.innerHTML = state.players.map((name, i) => {
+            if (!state.isActive[i]) return ''; // Skip inactive
+            return `
+                <button class="modal-btn" style="width:100%; text-align:left; padding:12px; margin-bottom:5px; background:var(--input-bg); border:none; color:var(--text-main); border-radius:8px;" onclick="confirmChangeDealer(${i})">
+                    ${i === state.dealerIndex ? '🎩 (Đang làm)' : '👤'} ${name}
+                </button>
+            `;
+        }).join('');
         document.getElementById('dealer-modal').classList.add('open');
     }
 
@@ -448,20 +523,13 @@
         state.dealerIndex = newIndex;
         closeChangeDealer();
         saveState();
-        
-        // Render lại giao diện
-        renderDashboard();
-        renderInputs(); // Vì danh sách input thay đổi (bỏ người làm cái mới)
+        renderGame();
         showToast(`Đã chuyển Cái cho ${state.players[newIndex]}`);
     }
 
     // --- UTILS ---
-    function updateCounter() {
-        document.getElementById('round-counter').textContent = `Ván: ${state.history.length}`;
-    }
-
     function saveState() {
-        localStorage.setItem('dealer_game_state', JSON.stringify(state));
+        localStorage.setItem('dealer_v2_state', JSON.stringify(state));
     }
 
     function toggleTheme() {
@@ -480,7 +548,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', init);
-
 </script>
 </body>
 </html>
