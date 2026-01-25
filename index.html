@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sổ Cái: Chế Độ Làm Cái v2</title>
+    <title>Dealer Mode Pro v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -59,7 +59,7 @@
             cursor: pointer; color: var(--text-main);
         }
 
-        /* DASHBOARD */
+        /* DASHBOARD (Scoreboard) */
         .dealer-section { margin-bottom: 15px; }
         .players-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
@@ -67,57 +67,75 @@
             background: var(--card-bg); border-radius: 12px; padding: 12px;
             display: flex; flex-direction: column; align-items: center;
             position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 1px solid transparent;
+            border: 1px solid transparent; transition: transform 0.2s;
         }
         
-        /* Paused State */
-        .player-card.paused { opacity: 0.6; background: rgba(0,0,0,0.2); border: 1px dashed #555; }
-        .paused-badge {
-            position: absolute; bottom: 5px; background: #333; color: #fff;
-            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; pointer-events: none;
-        }
-
+        .player-card.paused { opacity: 0.6; filter: grayscale(1); }
         .player-card.is-dealer {
             border: 2px solid var(--accent-gold);
             background: linear-gradient(to bottom right, var(--card-bg), rgba(255, 215, 0, 0.05));
-            padding: 20px;
+            padding: 15px;
         }
         .dealer-badge {
-            position: absolute; top: -12px; background: var(--card-bg);
+            position: absolute; top: -10px; background: var(--card-bg);
             border: 1px solid var(--accent-gold); color: var(--accent-gold);
-            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;
-            display: flex; align-items: center; gap: 5px;
+            padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
         }
 
-        .player-name { font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; color: var(--text-main); opacity: 0.9;}
-        .player-score { font-size: 1.6rem; font-weight: 700; }
-        .is-dealer .player-score { font-size: 2.2rem; }
+        .player-name { font-weight: 600; margin-bottom: 2px; font-size: 0.9rem; color: var(--text-main); opacity: 0.9;}
+        .player-score { font-size: 1.4rem; font-weight: 700; }
+        .is-dealer .player-score { font-size: 2rem; }
 
         .score-pos { color: var(--accent-green); }
         .score-neg { color: var(--accent-red); }
         .score-neutral { color: #888; }
 
-        /* INPUT AREA */
+        /* INPUT AREA (BETTING CONTROLS) */
         .input-panel {
             background: var(--card-bg); padding: 15px; border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 20px;
         }
-        .input-list { display: flex; flex-direction: column; gap: 10px; }
-        .input-row { display: flex; align-items: center; justify-content: space-between; }
-        .input-label { flex: 1; font-weight: 600; font-size: 0.95rem; }
-        .input-field {
-            width: 100px; padding: 10px; border-radius: 8px; border: 1px solid #444;
-            background: var(--input-bg); color: var(--text-main);
-            font-size: 1.1rem; text-align: center; font-weight: bold;
+        .input-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .control-row {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--input-bg); padding: 8px; border-radius: 10px;
         }
-        .input-field:focus { border-color: var(--accent-blue); outline: none; }
+        
+        .c-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .c-name { font-weight: 700; font-size: 0.95rem; }
+        .c-bet-wrapper { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: #888; }
+        .c-bet-input {
+            width: 50px; background: transparent; border: none; border-bottom: 1px solid #666;
+            color: var(--accent-blue); font-weight: bold; text-align: center; font-size: 0.9rem; padding: 2px;
+        }
+
+        .c-actions { display: flex; gap: 5px; align-items: center; }
+
+        /* Toggle Buttons */
+        .btn-toggle {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid #444;
+            background: var(--bg-color); color: #888; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        /* Win/Lose Logic Styles */
+        .btn-toggle.btn-lose.selected { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+        .btn-toggle.btn-win.selected { background: var(--accent-green); color: white; border-color: var(--accent-green); }
+        
+        /* Multiplier Button */
+        .btn-x2 {
+            padding: 8px; border-radius: 6px; border: 1px solid #444;
+            background: var(--bg-color); color: #888; font-weight: bold; cursor: pointer; font-size: 0.8rem;
+        }
+        .btn-x2.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
         /* ACTIONS */
-        .action-bar { display: flex; gap: 10px; margin-top: 10px; }
+        .action-bar { display: flex; gap: 10px; margin-top: 15px; }
         .btn-secondary { flex: 1; padding: 12px; border-radius: 8px; border: none; background: var(--input-bg); color: var(--text-main); font-weight: 600; cursor: pointer;}
         .btn-primary { width: 100%; padding: 15px; border-radius: 10px; background: var(--accent-green); color: white; font-weight: bold; border: none; font-size: 1rem; cursor: pointer; margin-top: 15px;}
 
-        /* MODALS (Settings & Change Dealer) */
+        /* MODAL */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 1000;
@@ -128,37 +146,31 @@
             background: var(--card-bg); padding: 20px; border-radius: 12px;
             width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
         }
-        .modal-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
         
-        /* Settings List Styles */
+        /* Settings List */
         .setting-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
         .setting-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); }
-        .btn-status {
-            width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer;
-            font-size: 1.2rem; background: var(--input-bg); display: flex; align-items: center; justify-content: center;
+        .btn-sort {
+            width: 30px; height: 40px; border-radius: 6px; background: var(--input-bg); border: none; color: var(--text-main);
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
         }
-        .btn-status.active { border: 1px solid var(--accent-green); color: var(--accent-green); background: rgba(64, 192, 87, 0.15); }
-        .btn-status.inactive { border: 1px solid #555; color: #777; opacity: 0.6; }
-        
+        .btn-status { width: 40px; height: 40px; border-radius: 8px; border: none; cursor: pointer; font-size: 1.2rem; background: var(--input-bg); }
+        .btn-status.active { border: 1px solid var(--accent-green); color: var(--accent-green); }
+        .btn-status.inactive { opacity: 0.5; }
         .btn-remove { background: var(--accent-red); color: white; border: none; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; }
-        .btn-add { width: 100%; background: var(--input-bg); color: var(--accent-blue); padding: 10px; border: 1px dashed var(--accent-blue); border-radius: 8px; cursor: pointer; margin-top: 10px;}
 
         /* HISTORY */
         .history-section { margin-top: 30px; }
-        .history-list { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; }
+        .history-list { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; }
         .history-item {
             background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 8px;
-            font-size: 0.9rem; border-left: 3px solid var(--accent-blue);
+            font-size: 0.85rem; border-left: 3px solid var(--accent-blue);
         }
-        .h-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; }
-        .h-detail { font-size: 0.85rem; color: #888; display: flex; flex-wrap: wrap; gap: 8px; }
-        .h-tag { background: var(--input-bg); padding: 2px 6px; border-radius: 4px; }
 
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             background: rgba(30,30,30,0.95); color: #fff;
-            padding: 12px 24px; border-radius: 50px;
-            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            padding: 12px 24px; border-radius: 50px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .toast.show { opacity: 1; }
     </style>
@@ -168,7 +180,7 @@
 <div class="container">
     <div class="header">
         <a href="https://thanhnhut201294.github.io/ghidiem" class="btn-icon">🏠</a>
-        <h1>Chế Độ Làm Cái v2</h1>
+        <h1>Dealer Pro v3</h1>
         <button class="btn-icon" onclick="toggleTheme()">🌓</button>
     </div>
 
@@ -179,10 +191,15 @@
         </div>
 
         <div class="input-panel">
-            <h3 style="margin: 0 0 15px 0; font-size: 1rem; color: #888;">Nhập điểm thắng/thua của nhà con</h3>
-            <div id="input-list" class="input-list">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <h3 style="margin:0; font-size:1rem; color:#888;">Nhập kết quả ván này</h3>
+                <span style="font-size:0.8rem; color:var(--accent-blue)" onclick="resetRoundControls()">Reset lựa chọn</span>
+            </div>
+            
+            <div id="control-list" class="input-list">
                 </div>
-            <button class="btn-primary" onclick="submitRound()">Lưu Ván Này</button>
+            
+            <button class="btn-primary" onclick="submitRound()">Lưu Kết Quả</button>
         </div>
 
         <div class="action-bar">
@@ -196,7 +213,7 @@
         </div>
 
         <div class="history-section">
-            <h3 style="font-size: 1rem; margin-bottom: 10px; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px;">Lịch sử điểm</h3>
+            <h3 style="font-size: 1rem; margin-bottom: 10px; color: #888; border-bottom: 1px solid #333; padding-bottom: 5px;">Lịch sử</h3>
             <ul id="history-list" class="history-list"></ul>
         </div>
     </div>
@@ -204,19 +221,19 @@
 
 <div id="settings-modal" class="modal">
     <div class="modal-content">
-        <h3>Quản lý người chơi</h3>
-        <p style="font-size: 0.8rem; color: #888;">🟢: Đang chơi | ⚫: Tạm nghỉ</p>
+        <h3>Sắp xếp & Người chơi</h3>
+        <p style="font-size: 0.8rem; color: #888;">Dùng ⬆️⬇️ để xếp vị trí ngồi thực tế</p>
         <div id="settings-list"></div>
-        <button class="btn-add" onclick="addPlayer()">+ Thêm người chơi</button>
-        <button class="btn-primary" onclick="closeSettings()">Lưu & Đóng</button>
+        <button class="btn-secondary" style="width:100%; margin-top:10px;" onclick="addPlayer()">+ Thêm người</button>
+        <button class="btn-primary" onclick="closeSettings()">Xong</button>
     </div>
 </div>
 
 <div id="dealer-modal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top: 0;">Chọn người làm Cái mới</h3>
-        <div id="dealer-select-list" class="modal-list"></div>
-        <button class="btn-secondary" onclick="closeChangeDealer()">Đóng</button>
+        <h3>Chọn người làm Cái mới</h3>
+        <div id="dealer-select-list" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
+        <button class="btn-secondary" style="width:100%; margin-top:15px;" onclick="closeChangeDealer()">Đóng</button>
     </div>
 </div>
 
@@ -227,30 +244,36 @@
     let state = {
         players: ['Người 1', 'Người 2', 'Người 3', 'Người 4'], 
         scores: [0, 0, 0, 0],
-        isActive: [true, true, true, true], // Trạng thái chơi/nghỉ
+        bets: [10, 10, 10, 10], // Default bets
+        isActive: [true, true, true, true],
         dealerIndex: 0, 
         history: [] 
     };
+    
+    // Temporary state for current round inputs (not saved to localstorage until submit)
+    let roundState = {}; // { playerIndex: { status: 'win'|'lose'|null, x2: false } }
 
     // --- INIT ---
     function init() {
-        const saved = localStorage.getItem('dealer_v2_state');
+        const saved = localStorage.getItem('dealer_v3_state');
         if (saved) {
             const parsed = JSON.parse(saved);
             state = { ...state, ...parsed };
-            // Data migration check
-            if (!state.isActive || state.isActive.length !== state.players.length) {
-                state.isActive = state.players.map(() => true);
+            
+            // Migration for new Bets feature
+            if (!state.bets || state.bets.length !== state.players.length) {
+                state.bets = state.players.map(() => 10);
             }
         }
+        resetRoundControls();
         renderGame();
         checkTheme();
     }
 
-    // --- RENDER GAME LOOP ---
+    // --- RENDERERS ---
     function renderGame() {
         renderDashboard();
-        renderInputs();
+        renderControls();
         renderHistory();
     }
 
@@ -269,8 +292,8 @@
             
             const html = `
                 <div class="player-card ${isDealer ? 'is-dealer' : ''} ${!isActive ? 'paused' : ''}">
-                    ${isDealer ? '<div class="dealer-badge">🎩 NHÀ CÁI</div>' : ''}
-                    ${!isActive && !isDealer ? '<div class="paused-badge">Tạm nghỉ</div>' : ''}
+                    ${isDealer ? '<div class="dealer-badge">🎩 CÁI</div>' : ''}
+                    ${!isActive && !isDealer ? '<div class="paused-badge">Nghỉ</div>' : ''}
                     <div class="player-name">${name}</div>
                     <div class="player-score ${colorClass}">${score > 0 ? '+' : ''}${score}</div>
                 </div>
@@ -284,157 +307,170 @@
         });
     }
 
-    function renderInputs() {
-        const list = document.getElementById('input-list');
+    function renderControls() {
+        const list = document.getElementById('control-list');
         list.innerHTML = '';
 
-        // Chỉ hiện ô nhập cho: Không phải Cái VÀ Đang Active
         let hasActivePlayer = false;
 
         state.players.forEach((name, i) => {
             if (i === state.dealerIndex || !state.isActive[i]) return;
             hasActivePlayer = true;
 
+            // Get temp state
+            const rState = roundState[i] || { status: null, x2: false };
+            const betVal = state.bets[i];
+
             const div = document.createElement('div');
-            div.className = 'input-row';
+            div.className = 'control-row';
             div.innerHTML = `
-                <div class="input-label">${name}</div>
-                <input type="number" id="input-${i}" class="input-field" placeholder="0">
+                <div class="c-info">
+                    <div class="c-name">${name}</div>
+                    <div class="c-bet-wrapper">
+                        Cược: <input type="number" class="c-bet-input" value="${betVal}" 
+                        onchange="updateBet(${i}, this.value)">
+                    </div>
+                </div>
+                <div class="c-actions">
+                    <button class="btn-x2 ${rState.x2 ? 'active' : ''}" onclick="toggleX2(${i})">x2</button>
+                    <button class="btn-toggle btn-lose ${rState.status === 'lose' ? 'selected' : ''}" 
+                        onclick="setRoundStatus(${i}, 'lose')">Thua</button>
+                    <button class="btn-toggle btn-win ${rState.status === 'win' ? 'selected' : ''}" 
+                        onclick="setRoundStatus(${i}, 'win')">Thắng</button>
+                </div>
             `;
             list.appendChild(div);
         });
         
         if (!hasActivePlayer) {
-            list.innerHTML = '<p style="text-align:center; color:#666">Chưa có người chơi (hoặc đang tạm nghỉ hết).</p>';
+            list.innerHTML = '<p style="text-align:center; color:#666; font-size:0.9rem">Không có nhà con (hoặc đang nghỉ hết).</p>';
         }
+    }
+
+    // --- GAME LOGIC ---
+    function updateBet(index, val) {
+        const newBet = parseFloat(val);
+        if (!isNaN(newBet)) {
+            state.bets[index] = newBet;
+            saveState(); // Save bet immediately
+        }
+    }
+
+    function setRoundStatus(index, status) {
+        if (!roundState[index]) roundState[index] = { status: null, x2: false };
+        
+        // Toggle off if clicking same status
+        if (roundState[index].status === status) {
+            roundState[index].status = null;
+        } else {
+            roundState[index].status = status;
+        }
+        renderControls();
+    }
+
+    function toggleX2(index) {
+        if (!roundState[index]) roundState[index] = { status: null, x2: false };
+        roundState[index].x2 = !roundState[index].x2;
+        renderControls();
+    }
+
+    function resetRoundControls() {
+        roundState = {};
+        renderControls();
+    }
+
+    function submitRound() {
+        let playerInputsSum = 0; // Sum of what PLAYERS get (Dealer gets inverse)
+        let roundChanges = new Array(state.players.length).fill(0);
+        let hasAction = false;
+        let logDetails = [];
+
+        state.players.forEach((name, i) => {
+            if (i === state.dealerIndex || !state.isActive[i]) return;
+
+            const rState = roundState[i];
+            if (rState && rState.status) {
+                hasAction = true;
+                let amount = state.bets[i];
+                if (rState.x2) amount *= 2;
+
+                // If Player Wins -> Player +, Dealer -
+                // If Player Loses -> Player -, Dealer +
+                const change = rState.status === 'win' ? amount : -amount;
+                
+                state.scores[i] += change;
+                roundChanges[i] = change;
+                playerInputsSum += change;
+                
+                logDetails.push({ name, change, x2: rState.x2 });
+            }
+        });
+
+        if (!hasAction) {
+            showToast("Chưa chọn Thắng/Thua cho ai cả!");
+            return;
+        }
+
+        // Dealer gets inverse of total player changes
+        const dealerChange = -playerInputsSum;
+        state.scores[state.dealerIndex] += dealerChange;
+        roundChanges[state.dealerIndex] = dealerChange;
+
+        // History
+        state.history.push({
+            dealerIndex: state.dealerIndex,
+            changes: roundChanges,
+            details: logDetails // Extra info for nicer history
+        });
+
+        saveState();
+        resetRoundControls();
+        renderDashboard();
+        renderHistory();
+        showToast("Đã cập nhật!");
     }
 
     function renderHistory() {
         const list = document.getElementById('history-list');
         const historyRev = [...state.history].reverse();
         
-        if (historyRev.length === 0) {
-            list.innerHTML = '<li style="text-align:center; color:#666; font-size:0.8rem; padding:10px;">Chưa có dữ liệu ván đấu</li>';
-            return;
-        }
-
         list.innerHTML = historyRev.map((h, i) => {
             const roundNum = state.history.length - i;
             const dealerName = state.players[h.dealerIndex] || "Unknown";
             const dealerChange = h.changes[h.dealerIndex];
-            
-            // Build detail string for players who played
-            let detailsHTML = '';
-            h.changes.forEach((val, idx) => {
-                if (idx !== h.dealerIndex && val !== 0) {
-                    const pName = state.players[idx] || "Deleted";
-                    const color = val > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-                    detailsHTML += `<span class="h-tag" style="color:${color}">${pName}: ${val > 0 ? '+'+val : val}</span>`;
-                }
-            });
+            const dColor = dealerChange > 0 ? 'var(--accent-green)' : (dealerChange < 0 ? 'var(--accent-red)' : '#888');
 
-            const dealerColor = dealerChange > 0 ? 'var(--accent-green)' : (dealerChange < 0 ? 'var(--accent-red)' : '#888');
+            // Build detail HTML
+            let detailHtml = '';
+            if (h.details) {
+                detailHtml = h.details.map(d => {
+                    const c = d.change > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                    return `<span style="background:var(--input-bg); padding:2px 6px; border-radius:4px; margin-right:4px; font-size:0.75rem; color:${c}">
+                        ${d.name} ${d.x2 ? '(x2)':''} ${d.change > 0 ? '+'+d.change : d.change}
+                    </span>`;
+                }).join('');
+            }
 
             return `
                 <li class="history-item">
-                    <div class="h-header">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:4px;">
                         <span>#${roundNum} - Cái: ${dealerName}</span>
-                        <span style="color:${dealerColor}">${dealerChange > 0 ? '+'+dealerChange : dealerChange}</span>
+                        <span style="color:${dColor}">${dealerChange > 0 ? '+'+dealerChange : dealerChange}</span>
                     </div>
-                    <div class="h-detail">
-                        ${detailsHTML || '<span style="font-style:italic">Không có phát sinh điểm</span>'}
-                    </div>
+                    <div>${detailHtml}</div>
                 </li>
             `;
         }).join('');
     }
 
-    // --- LOGIC ---
-    function submitRound() {
-        let playerInputsSum = 0;
-        let roundChanges = new Array(state.players.length).fill(0);
-        let hasInput = false;
-
-        state.players.forEach((_, i) => {
-            if (i === state.dealerIndex || !state.isActive[i]) return;
-
-            const inputEl = document.getElementById(`input-${i}`);
-            if (inputEl) {
-                const val = parseInt(inputEl.value);
-                if (!isNaN(val)) {
-                    hasInput = true;
-                    state.scores[i] += val;
-                    roundChanges[i] = val;
-                    playerInputsSum += val;
-                    inputEl.value = '';
-                }
-            }
-        });
-
-        if (!hasInput) return;
-
-        // Tính điểm cái: Cái đối ứng với tổng con
-        const dealerChange = -playerInputsSum;
-        state.scores[state.dealerIndex] += dealerChange;
-        roundChanges[state.dealerIndex] = dealerChange;
-
-        // Lưu lịch sử snapshot (Copy mảng changes để tránh lỗi tham chiếu khi undo)
-        state.history.push({
-            dealerIndex: state.dealerIndex,
-            changes: [...roundChanges]
-        });
-
-        saveState();
-        renderGame();
-        showToast("Đã cập nhật!");
-        
-        const firstInput = document.querySelector('.input-field');
-        if(firstInput) firstInput.focus();
-    }
-
-    function undo() {
-        if (state.history.length === 0) return;
-        const lastRound = state.history.pop();
-
-        // Kiểm tra độ dài mảng history cũ với số người chơi hiện tại
-        // Nếu số lượng người chơi bị thay đổi (xóa bớt) thì undo có thể bị lệch index
-        // Ở đây ta chấp nhận rủi ro hoặc chỉ undo cho những index còn tồn tại
-        lastRound.changes.forEach((change, i) => {
-            if (state.scores[i] !== undefined) {
-                state.scores[i] -= change;
-            }
-        });
-
-        saveState();
-        renderGame();
-        showToast("↩️ Đã hoàn tác");
-    }
-
-    function resetGame() {
-        if (confirm("Xóa hết điểm và lịch sử?")) {
-            state.scores = state.players.map(() => 0);
-            state.history = [];
-            saveState();
-            renderGame();
-        }
-    }
-
-    // --- SETTINGS (ADD/REMOVE/PAUSE) ---
+    // --- SORTING & SETTINGS ---
     function openSettings() {
         renderSettingsList();
         document.getElementById('settings-modal').classList.add('open');
     }
-
+    
     function closeSettings() {
         document.getElementById('settings-modal').classList.remove('open');
-        
-        // Safety check: Nếu Dealer bị Pause, bắt buộc đổi Dealer
-        if (!state.isActive[state.dealerIndex]) {
-            alert("Người làm Cái đang tạm nghỉ. Vui lòng chọn Cái mới!");
-            openChangeDealer();
-            return;
-        }
-        
         saveState();
         renderGame();
     }
@@ -443,12 +479,15 @@
         const list = document.getElementById('settings-list');
         list.innerHTML = '';
         state.players.forEach((name, i) => {
-            const isActive = state.isActive[i];
             const div = document.createElement('div');
             div.className = 'setting-row';
             div.innerHTML = `
-                <button class="btn-status ${isActive ? 'active' : 'inactive'}" onclick="toggleActive(${i})">
-                    ${isActive ? '🟢' : '⚫'}
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <button class="btn-sort" onclick="movePlayer(${i}, -1)">⬆️</button>
+                    <button class="btn-sort" onclick="movePlayer(${i}, 1)">⬇️</button>
+                </div>
+                <button class="btn-status ${state.isActive[i] ? 'active' : 'inactive'}" onclick="toggleActive(${i})">
+                    ${state.isActive[i] ? '🟢' : '⚫'}
                 </button>
                 <input type="text" class="setting-input" value="${name}" onchange="updateName(${i}, this.value)">
                 <button class="btn-remove" onclick="removePlayer(${i})">✕</button>
@@ -457,96 +496,76 @@
         });
     }
 
-    function toggleActive(index) {
-        // Không cho phép pause người đang làm cái (UX choice: phải đổi cái trước)
-        if (index === state.dealerIndex && state.isActive[index]) {
-            alert("Không thể tạm nghỉ người đang làm Cái. Hãy đổi Cái trước!");
-            return;
-        }
-        state.isActive[index] = !state.isActive[index];
+    function movePlayer(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= state.players.length) return;
+
+        // Swap all parallel arrays
+        swap(state.players, index, newIndex);
+        swap(state.scores, index, newIndex);
+        swap(state.bets, index, newIndex);
+        swap(state.isActive, index, newIndex);
+
+        // Update dealer index if moved
+        if (state.dealerIndex === index) state.dealerIndex = newIndex;
+        else if (state.dealerIndex === newIndex) state.dealerIndex = index;
+
         renderSettingsList();
     }
 
-    function updateName(index, val) {
-        state.players[index] = val;
+    function swap(arr, a, b) {
+        [arr[a], arr[b]] = [arr[b], arr[a]];
     }
 
     function addPlayer() {
         state.players.push(`Người ${state.players.length + 1}`);
         state.scores.push(0);
+        state.bets.push(10);
         state.isActive.push(true);
         renderSettingsList();
     }
+    
+    // ... [Reuse toggleActive, removePlayer, undo, resetGame, changeDealer from previous v2 logic] ...
+    // For brevity, putting essential shared logic here:
 
-    function removePlayer(index) {
-        if (state.players.length <= 2) {
-            alert("Cần tối thiểu 2 người chơi!");
-            return;
-        }
-        if (index === state.dealerIndex) {
-            alert("Người này đang làm Cái. Vui lòng đổi Cái trước khi xóa!");
-            return;
-        }
-        
-        if (confirm("Xóa người chơi này? Điểm số sẽ mất.")) {
-            state.players.splice(index, 1);
-            state.scores.splice(index, 1);
-            state.isActive.splice(index, 1);
-            
-            // Adjust dealer index if needed
-            if (state.dealerIndex > index) state.dealerIndex--;
-            
+    function toggleActive(i) {
+        if (i === state.dealerIndex && state.isActive[i]) { alert("Đổi Cái trước khi nghỉ!"); return; }
+        state.isActive[i] = !state.isActive[i];
+        renderSettingsList();
+    }
+    function updateName(i, v) { state.players[i] = v; }
+    function removePlayer(i) {
+        if (state.players.length <= 2) return;
+        if (i === state.dealerIndex) { alert("Đổi Cái trước khi xóa!"); return; }
+        if(confirm("Xóa người này?")) {
+            state.players.splice(i,1); state.scores.splice(i,1); state.bets.splice(i,1); state.isActive.splice(i,1);
+            if (state.dealerIndex > i) state.dealerIndex--;
             renderSettingsList();
         }
     }
-
-    // --- CHANGE DEALER ---
+    function undo() {
+        if (!state.history.length) return;
+        const h = state.history.pop();
+        h.changes.forEach((c, i) => { if(state.scores[i]!==undefined) state.scores[i] -= c; });
+        saveState(); renderGame(); showToast("Đã hoàn tác");
+    }
+    function resetGame() {
+        if(confirm("Chơi lại từ đầu?")) {
+            state.scores = state.players.map(()=>0); state.history=[]; saveState(); renderGame();
+        }
+    }
     function openChangeDealer() {
         const list = document.getElementById('dealer-select-list');
-        // Chỉ hiện những người đang Active để chọn làm cái
-        list.innerHTML = state.players.map((name, i) => {
-            if (!state.isActive[i]) return ''; // Skip inactive
-            return `
-                <button class="modal-btn" style="width:100%; text-align:left; padding:12px; margin-bottom:5px; background:var(--input-bg); border:none; color:var(--text-main); border-radius:8px;" onclick="confirmChangeDealer(${i})">
-                    ${i === state.dealerIndex ? '🎩 (Đang làm)' : '👤'} ${name}
-                </button>
-            `;
-        }).join('');
+        list.innerHTML = state.players.map((n,i) => state.isActive[i] ? `<button onclick="setDealer(${i})" style="padding:10px; margin-bottom:5px; width:100%; border-radius:5px; border:none; background:var(--input-bg); color:var(--text-main); text-align:left;">${i===state.dealerIndex?'🎩 ':''} ${n}</button>` : '').join('');
         document.getElementById('dealer-modal').classList.add('open');
     }
-
-    function closeChangeDealer() {
-        document.getElementById('dealer-modal').classList.remove('open');
-    }
-
-    function confirmChangeDealer(newIndex) {
-        state.dealerIndex = newIndex;
-        closeChangeDealer();
-        saveState();
-        renderGame();
-        showToast(`Đã chuyển Cái cho ${state.players[newIndex]}`);
-    }
-
-    // --- UTILS ---
-    function saveState() {
-        localStorage.setItem('dealer_v2_state', JSON.stringify(state));
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-    }
-
-    function checkTheme() {
-        // Default dark
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
-    }
-
+    function setDealer(i) { state.dealerIndex = i; document.getElementById('dealer-modal').classList.remove('open'); saveState(); renderGame(); }
+    function closeChangeDealer() { document.getElementById('dealer-modal').classList.remove('open'); }
+    function saveState() { localStorage.setItem('dealer_v3_state', JSON.stringify(state)); }
+    function toggleTheme() { document.body.classList.toggle('light-mode'); }
+    function checkTheme() {}
+    function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+    
     document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
