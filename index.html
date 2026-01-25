@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dealer Ultra v5</title>
+    <title>Dealer Ultra v6</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -29,99 +29,111 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color); color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 70px; /* Footer height */
+            padding-bottom: 70px;
             font-size: 14px;
         }
 
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* HEADER HEADER */
+        /* HEADER DEALER - NỔI BẬT HƠN */
         .dealer-sticky {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(15, 15, 15, 0.96);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid #333;
-            padding: 8px 12px;
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid var(--accent-gold); /* Viền vàng nổi bật */
+            padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            height: 40px; /* Fixed height compact */
+            box-shadow: 0 4px 15px rgba(252, 196, 25, 0.15); /* Hiệu ứng tỏa sáng nhẹ */
         }
-        body.light-mode .dealer-sticky { background: rgba(248, 249, 250, 0.96); border-bottom: 1px solid #ddd; }
+        body.light-mode .dealer-sticky { background: rgba(255, 255, 255, 0.98); }
 
-        .dealer-info { display: flex; align-items: center; gap: 6px; }
-        .dealer-icon { font-size: 1.2rem; }
-        .dealer-name { font-weight: 700; font-size: 0.95rem; color: var(--accent-gold); overflow: hidden; white-space: nowrap; max-width: 150px; text-overflow: ellipsis; }
-        .dealer-score { font-size: 1.3rem; font-weight: 800; }
+        .dealer-info { display: flex; align-items: center; gap: 8px; }
+        .dealer-badge { 
+            background: var(--accent-gold); color: #000; 
+            padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.8rem;
+        }
+        .dealer-name { font-weight: 700; font-size: 1.1rem; color: var(--text-main); max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        
+        .dealer-score { 
+            font-size: 1.6rem; font-weight: 900; 
+            color: var(--accent-gold); /* Điểm cái luôn màu vàng hoặc theo thắng thua */
+            text-shadow: 0 0 10px rgba(252, 196, 25, 0.2);
+        }
 
-        /* GRID LAYOUT - ULTRA COMPACT */
+        /* GRID LAYOUT */
         .player-list {
-            padding: 8px;
+            padding: 10px;
             display: grid;
-            /* Tự động chia cột: nhỏ nhất 140px, nếu màn to thì 3-4 cột */
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 6px;
+            gap: 8px;
         }
 
         /* PLAYER CARD */
         .player-card {
-            background: var(--card-bg); border-radius: 8px; padding: 6px 8px;
-            display: flex; flex-direction: column; gap: 4px;
-            border: 1px solid transparent;
-            position: relative;
+            background: var(--card-bg); border-radius: 10px; padding: 8px 10px;
+            display: flex; flex-direction: column; gap: 6px;
+            border: 1px solid transparent; position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .player-card.paused { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
 
-        /* Row 1: Name & Score */
-        .card-header { display: flex; justify-content: space-between; align-items: center; height: 22px; }
-        .p-name { font-weight: 600; font-size: 0.85rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px;}
-        .p-score { font-size: 1.1rem; font-weight: 800; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; height: 24px; }
+        .p-name { font-weight: 600; font-size: 0.9rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;}
+        .p-score { font-size: 1.2rem; font-weight: 800; }
         
         .score-pos { color: var(--accent-green); }
         .score-neg { color: var(--accent-red); }
         .score-neutral { color: #888; }
 
-        /* Row 2: Controls */
+        /* CONTROLS - BUTTONS TO HƠN, CHỮ NHỎ LẠI */
         .card-controls {
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--input-bg); padding: 3px; border-radius: 6px;
-            gap: 2px;
+            background: var(--input-bg); padding: 4px; border-radius: 8px;
+            gap: 4px;
         }
 
-        .bet-input-wrapper { position: relative; width: 35px; }
+        .bet-input-wrapper { position: relative; width: 40px; }
         .bet-input {
             width: 100%; background: transparent; border: none; 
             color: var(--accent-blue); font-weight: bold; text-align: center; 
-            font-size: 0.9rem; padding: 2px 0; border-bottom: 1px solid #555;
+            font-size: 1rem; padding: 4px 0; border-bottom: 1px solid #555;
         }
 
-        .btn-group { display: flex; gap: 3px; flex: 1; justify-content: flex-end; }
+        .btn-group { display: flex; gap: 4px; flex: 1; justify-content: flex-end; }
         
         .btn-act {
-            padding: 4px 0; width: 32px; border-radius: 4px; border: none;
-            font-size: 0.75rem; font-weight: 700; cursor: pointer;
-            background: var(--bg-color); color: #777;
+            flex: 1; /* Tự giãn đều */
+            padding: 8px 0; /* Tăng chiều cao nút */
+            border-radius: 6px; border: none;
+            font-size: 0.7rem; /* Giảm font chữ */
+            font-weight: 800; cursor: pointer;
+            background: var(--bg-color); color: #888;
             display: flex; justify-content: center; align-items: center;
+            text-transform: uppercase; /* Chữ in hoa cho gọn */
+            transition: all 0.1s;
         }
         
-        .btn-x2 { width: 22px; color: var(--accent-gold); border: 1px solid #444; padding: 0;}
+        .btn-x2 { flex: 0 0 28px; color: var(--accent-gold); border: 1px solid #444; padding: 0; font-size: 0.8rem;}
         .btn-x2.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        .btn-lose.selected { background: var(--accent-red); color: white; }
-        .btn-win.selected { background: var(--accent-green); color: white; }
+        .btn-lose.selected { background: var(--accent-red); color: white; box-shadow: 0 2px 6px rgba(240, 62, 62, 0.4); }
+        .btn-win.selected { background: var(--accent-green); color: white; box-shadow: 0 2px 6px rgba(55, 178, 77, 0.4); }
 
-        /* FOOTER - COMPACT */
+        /* FOOTER */
         .footer-actions {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--card-bg); border-top: 1px solid rgba(128,128,128,0.1);
             padding: 8px; box-sizing: border-box;
             display: flex; gap: 8px; z-index: 90; height: 60px;
             align-items: center;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
         }
         .btn-submit {
             flex: 2; height: 44px; background: var(--accent-green);
-            color: white; font-weight: bold; border-radius: 8px; border: none; font-size: 1rem;
-            cursor: pointer;
+            color: white; font-weight: bold; border-radius: 8px; border: none; font-size: 1.1rem;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(55, 178, 77, 0.3);
         }
+        .btn-submit:active { transform: scale(0.98); }
         .btn-icon-footer {
             flex: 1; height: 44px; background: var(--input-bg); border: none; border-radius: 8px;
             color: var(--text-main); font-size: 1.2rem; cursor: pointer;
@@ -141,8 +153,8 @@
         }
         
         .setting-row { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; }
-        .setting-input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); font-size: 0.9rem;}
-        .btn-mini { width: 30px; height: 35px; border-radius: 6px; background: var(--input-bg); border: none; color: var(--text-main); cursor: pointer; display:grid; place-items:center;}
+        .setting-input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); font-size: 0.95rem;}
+        .btn-mini { width: 35px; height: 38px; border-radius: 6px; background: var(--input-bg); border: none; color: var(--text-main); cursor: pointer; display:grid; place-items:center; font-size: 1rem;}
         .btn-status.active { border: 1px solid var(--accent-green); color: var(--accent-green); }
 
         .toast {
@@ -204,7 +216,7 @@
 <script>
     // --- STATE ---
     let state = {
-        players: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], // Test với 10 người
+        players: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], 
         scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         bets: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10], 
         isActive: [true, true, true, true, true, true, true, true, true, true],
@@ -216,11 +228,11 @@
 
     // --- INIT ---
     function init() {
-        const saved = localStorage.getItem('dealer_ultra_v5');
+        const saved = localStorage.getItem('dealer_ultra_v6');
         if (saved) {
             const parsed = JSON.parse(saved);
             state = { ...state, ...parsed };
-            // Fix arrays length mismatch if players added/removed improperly before
+            // Fix arrays
             if (state.bets.length !== state.players.length) state.bets = state.players.map(()=>10);
             if (state.isActive.length !== state.players.length) state.isActive = state.players.map(()=>true);
         }
@@ -242,7 +254,7 @@
         
         container.innerHTML = `
             <div class="dealer-info">
-                <span class="dealer-icon">🎩</span>
+                <span class="dealer-badge">NHÀ CÁI</span>
                 <span class="dealer-name">${name}</span>
             </div>
             <div class="dealer-score ${colorClass}">${score > 0 ? '+'+score : score}</div>
@@ -265,7 +277,6 @@
             const card = document.createElement('div');
             card.className = `player-card ${!isActive ? 'paused' : ''}`;
             
-            // HTML siêu gọn
             if (isActive) {
                 card.innerHTML = `
                     <div class="card-header">
@@ -278,8 +289,8 @@
                         </div>
                         <div class="btn-group">
                             <button class="btn-act btn-x2 ${rState.x2 ? 'active' : ''}" onclick="toggleX2(${i})">x2</button>
-                            <button class="btn-act btn-lose ${rState.status === 'lose' ? 'selected' : ''}" onclick="setStatus(${i}, 'lose')">Thua</button>
-                            <button class="btn-act btn-win ${rState.status === 'win' ? 'selected' : ''}" onclick="setStatus(${i}, 'win')">Thắng</button>
+                            <button class="btn-act btn-lose ${rState.status === 'lose' ? 'selected' : ''}" onclick="setStatus(${i}, 'lose')">THUA</button>
+                            <button class="btn-act btn-win ${rState.status === 'win' ? 'selected' : ''}" onclick="setStatus(${i}, 'win')">THẮNG</button>
                         </div>
                     </div>
                 `;
@@ -289,7 +300,7 @@
                         <div class="p-name">${name}</div>
                         <div class="p-score score-neutral">${score}</div>
                     </div>
-                    <div style="font-size:0.75rem; color:#666; text-align:center; padding:3px;">Tạm nghỉ</div>
+                    <div style="font-size:0.75rem; color:#666; text-align:center; padding:5px;">Tạm nghỉ</div>
                 `;
             }
             list.appendChild(card);
@@ -330,6 +341,7 @@
                 let amt = state.bets[i];
                 if (rState.x2) amt *= 2;
                 
+                // Player Thắng -> Nhà Cái Thua (Trừ điểm nhà cái)
                 const change = rState.status === 'win' ? amt : -amt;
                 
                 state.scores[i] += change;
@@ -360,7 +372,7 @@
         saveState(); renderAll(); showToast("Đã hoàn tác");
     }
 
-    // --- SETTINGS (FIXED RE-RENDER BUG) ---
+    // --- SETTINGS ---
     function openSettings() {
         renderSettingsList();
         openModal('settings-modal');
@@ -385,13 +397,10 @@
         });
     }
 
-    // --- FIX: ADD RENDER_ALL AFTER ACTIONS ---
     function addPlayer() {
         state.players.push(`Người ${state.players.length+1}`);
         state.scores.push(0); state.bets.push(10); state.isActive.push(true);
-        saveState();
-        renderAll(); // Cập nhật màn hình chính
-        renderSettingsList(); // Cập nhật danh sách trong modal
+        saveState(); renderAll(); renderSettingsList();
     }
 
     function removePlayer(i) {
@@ -399,18 +408,14 @@
         if(confirm("Xóa?")) {
             state.players.splice(i,1); state.scores.splice(i,1); state.bets.splice(i,1); state.isActive.splice(i,1);
             if(state.dealerIndex>i) state.dealerIndex--;
-            saveState();
-            renderAll(); // FIX: Update main screen
-            renderSettingsList();
+            saveState(); renderAll(); renderSettingsList();
         }
     }
 
     function toggleActive(i) {
         if(i===state.dealerIndex) return alert("Đang làm Cái!");
         state.isActive[i] = !state.isActive[i];
-        saveState();
-        renderAll(); // FIX
-        renderSettingsList();
+        saveState(); renderAll(); renderSettingsList();
     }
 
     function movePlayer(idx, dir) {
@@ -419,15 +424,11 @@
         swap(idx, nIdx);
         if (state.dealerIndex === idx) state.dealerIndex = nIdx;
         else if (state.dealerIndex === nIdx) state.dealerIndex = idx;
-        saveState();
-        renderAll(); // FIX
-        renderSettingsList();
+        saveState(); renderAll(); renderSettingsList();
     }
     
     function updateName(i, val) {
-        state.players[i] = val;
-        saveState();
-        renderAll(); // FIX: Tên cập nhật ngay lập tức
+        state.players[i] = val; saveState(); renderAll();
     }
 
     function swap(a, b) {
@@ -441,7 +442,7 @@
         closeModal('settings-modal');
         const list = document.getElementById('dealer-select-list');
         list.innerHTML = state.players.map((n,i) => 
-            state.isActive[i] ? `<button class="btn-mini" style="width:100%; justify-content:flex-start; padding-left:10px" onclick="setDealer(${i})">${i===state.dealerIndex?'🎩 ':''} ${n}</button>` : ''
+            state.isActive[i] ? `<button class="btn-mini" style="width:100%; justify-content:flex-start; padding-left:10px; font-weight:bold" onclick="setDealer(${i})">${i===state.dealerIndex?'🎩 ':''} ${n}</button>` : ''
         ).join('');
         openModal('dealer-modal');
     }
@@ -475,7 +476,7 @@
     // --- UTILS ---
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function saveState() { localStorage.setItem('dealer_ultra_v5', JSON.stringify(state)); }
+    function saveState() { localStorage.setItem('dealer_ultra_v6', JSON.stringify(state)); }
     function toggleTheme() { document.body.classList.toggle('light-mode'); }
     function checkTheme() {}
     function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
