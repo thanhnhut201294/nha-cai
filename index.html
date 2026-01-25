@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dealer Compact v4</title>
+    <title>Dealer Ultra v5</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
             --text-main: #e0e0e0;
             --accent-blue: #4dabf7;
-            --accent-green: #40c057;
-            --accent-red: #fa5252;
-            --accent-gold: #ffd43b;
-            --input-bg: #2c2c2c;
-            --btn-bg: #333;
+            --accent-green: #37b24d;
+            --accent-red: #f03e3e;
+            --accent-gold: #fcc419;
+            --input-bg: #252525;
         }
 
         body.light-mode {
-            --bg-color: #f2f2f7;
+            --bg-color: #f8f9fa;
             --card-bg: #ffffff;
-            --text-main: #1c1c1e;
-            --input-bg: #e5e5ea;
-            --btn-bg: #f0f0f0;
+            --text-main: #212529;
+            --input-bg: #e9ecef;
         }
 
         body {
@@ -31,52 +29,53 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color); color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 120px; /* Chừa chỗ cho footer */
+            padding-bottom: 70px; /* Footer height */
+            font-size: 14px;
         }
 
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* HEADER */
-        .header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px; background: var(--bg-color);
-        }
-        .header h1 { font-size: 1.1rem; margin: 0; background: linear-gradient(45deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-icon { background: var(--input-bg); border: none; border-radius: 8px; width: 36px; height: 36px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; text-decoration: none;}
-
-        /* DEALER STICKY BLOCK */
+        /* HEADER HEADER */
         .dealer-sticky {
             position: sticky; top: 0; z-index: 100;
-            background: rgba(30, 30, 30, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 15, 15, 0.96);
+            backdrop-filter: blur(5px);
             border-bottom: 1px solid #333;
-            padding: 12px 15px;
+            padding: 8px 12px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            height: 40px; /* Fixed height compact */
         }
-        body.light-mode .dealer-sticky { background: rgba(255,255,255,0.95); border-bottom: 1px solid #ddd; }
+        body.light-mode .dealer-sticky { background: rgba(248, 249, 250, 0.96); border-bottom: 1px solid #ddd; }
 
-        .dealer-info { display: flex; align-items: center; gap: 8px; }
-        .dealer-icon { font-size: 1.5rem; }
-        .dealer-name { font-weight: 700; font-size: 1.1rem; color: var(--accent-gold); }
-        .dealer-score { font-size: 1.8rem; font-weight: 800; }
+        .dealer-info { display: flex; align-items: center; gap: 6px; }
+        .dealer-icon { font-size: 1.2rem; }
+        .dealer-name { font-weight: 700; font-size: 0.95rem; color: var(--accent-gold); overflow: hidden; white-space: nowrap; max-width: 150px; text-overflow: ellipsis; }
+        .dealer-score { font-size: 1.3rem; font-weight: 800; }
 
-        /* PLAYER LIST */
-        .player-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        /* GRID LAYOUT - ULTRA COMPACT */
+        .player-list {
+            padding: 8px;
+            display: grid;
+            /* Tự động chia cột: nhỏ nhất 140px, nếu màn to thì 3-4 cột */
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 6px;
+        }
 
+        /* PLAYER CARD */
         .player-card {
-            background: var(--card-bg); border-radius: 16px; padding: 12px 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; gap: 10px;
+            background: var(--card-bg); border-radius: 8px; padding: 6px 8px;
+            display: flex; flex-direction: column; gap: 4px;
+            border: 1px solid transparent;
+            position: relative;
         }
-        .player-card.paused { opacity: 0.6; filter: grayscale(1); }
+        .player-card.paused { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
 
         /* Row 1: Name & Score */
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .p-name { font-weight: 600; font-size: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 5px;}
-        .p-badge { font-size: 0.7rem; background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; height: 22px; }
+        .p-name { font-weight: 600; font-size: 0.85rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px;}
+        .p-score { font-size: 1.1rem; font-weight: 800; }
         
-        .p-score { font-size: 1.4rem; font-weight: 800; }
         .score-pos { color: var(--accent-green); }
         .score-neg { color: var(--accent-red); }
         .score-neutral { color: #888; }
@@ -84,44 +83,50 @@
         /* Row 2: Controls */
         .card-controls {
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--input-bg); padding: 6px; border-radius: 10px;
+            background: var(--input-bg); padding: 3px; border-radius: 6px;
+            gap: 2px;
         }
 
-        .bet-area { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #888; padding-left: 5px; }
+        .bet-input-wrapper { position: relative; width: 35px; }
         .bet-input {
-            width: 50px; background: transparent; border: none; border-bottom: 1px solid #666;
-            color: var(--accent-blue); font-weight: bold; text-align: center; font-size: 1.1rem; padding: 2px;
+            width: 100%; background: transparent; border: none; 
+            color: var(--accent-blue); font-weight: bold; text-align: center; 
+            font-size: 0.9rem; padding: 2px 0; border-bottom: 1px solid #555;
         }
-        
-        .btn-group { display: flex; gap: 6px; }
+
+        .btn-group { display: flex; gap: 3px; flex: 1; justify-content: flex-end; }
         
         .btn-act {
-            padding: 8px 14px; border-radius: 8px; border: 1px solid transparent;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            background: var(--bg-color); color: #888;
-            transition: all 0.15s;
+            padding: 4px 0; width: 32px; border-radius: 4px; border: none;
+            font-size: 0.75rem; font-weight: 700; cursor: pointer;
+            background: var(--bg-color); color: #777;
+            display: flex; justify-content: center; align-items: center;
         }
         
-        .btn-x2 { font-weight: 800; color: var(--accent-gold); border: 1px solid #444; }
+        .btn-x2 { width: 22px; color: var(--accent-gold); border: 1px solid #444; padding: 0;}
         .btn-x2.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        .btn-lose.selected { background: var(--accent-red); color: white; box-shadow: 0 2px 5px rgba(250, 82, 82, 0.4); }
-        .btn-win.selected { background: var(--accent-green); color: white; box-shadow: 0 2px 5px rgba(64, 192, 87, 0.4); }
+        .btn-lose.selected { background: var(--accent-red); color: white; }
+        .btn-win.selected { background: var(--accent-green); color: white; }
 
-        /* FIXED FOOTER ACTIONS */
+        /* FOOTER - COMPACT */
         .footer-actions {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--card-bg); border-top: 1px solid rgba(128,128,128,0.1);
-            padding: 10px 15px 20px 15px; box-sizing: border-box;
-            display: flex; flex-direction: column; gap: 10px; z-index: 90;
+            padding: 8px; box-sizing: border-box;
+            display: flex; gap: 8px; z-index: 90; height: 60px;
+            align-items: center;
         }
         .btn-submit {
-            width: 100%; padding: 14px; background: var(--accent-green);
-            color: white; font-weight: bold; border-radius: 12px; border: none; font-size: 1.1rem;
-            box-shadow: 0 4px 10px rgba(64, 192, 87, 0.3); cursor: pointer;
+            flex: 2; height: 44px; background: var(--accent-green);
+            color: white; font-weight: bold; border-radius: 8px; border: none; font-size: 1rem;
+            cursor: pointer;
         }
-        .sub-actions { display: flex; gap: 10px; }
-        .btn-sub { flex: 1; padding: 10px; background: var(--input-bg); border: none; border-radius: 8px; color: var(--text-main); font-weight: 600; cursor: pointer; }
+        .btn-icon-footer {
+            flex: 1; height: 44px; background: var(--input-bg); border: none; border-radius: 8px;
+            color: var(--text-main); font-size: 1.2rem; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+        }
 
         /* MODALS */
         .modal {
@@ -131,110 +136,99 @@
         }
         .modal.open { display: flex; }
         .modal-content {
-            background: var(--card-bg); padding: 20px; border-radius: 16px;
-            width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            width: 90%; max-width: 350px; max-height: 80vh; overflow-y: auto;
         }
         
-        .setting-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .setting-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); }
-        .btn-icon-small { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; background: var(--input-bg); border: none; color: var(--text-main); cursor: pointer;}
-        
-        /* History */
-        .history-item { 
-            background: var(--input-bg); padding: 10px; border-radius: 8px; margin-bottom: 8px; 
-            font-size: 0.85rem; border-left: 3px solid var(--accent-blue);
-        }
+        .setting-row { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; }
+        .setting-input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #444; background: var(--input-bg); color: var(--text-main); font-size: 0.9rem;}
+        .btn-mini { width: 30px; height: 35px; border-radius: 6px; background: var(--input-bg); border: none; color: var(--text-main); cursor: pointer; display:grid; place-items:center;}
+        .btn-status.active { border: 1px solid var(--accent-green); color: var(--accent-green); }
 
         .toast {
-            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(30,30,30,0.95); color: #fff;
-            padding: 10px 20px; border-radius: 50px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(30,30,30,0.9); color: #fff;
+            padding: 8px 16px; border-radius: 20px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; font-size: 0.9rem;
         }
         .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
 
-<div id="dealer-header" class="dealer-sticky">
-    </div>
+<div id="dealer-header" class="dealer-sticky"></div>
 
 <div class="container">
-    <div class="header">
-        <a href="https://thanhnhut201294.github.io/ghidiem" class="btn-icon">🏠</a>
-        <h1>Dealer Compact</h1>
-        <button class="btn-icon" onclick="toggleTheme()">🌓</button>
-    </div>
-
-    <div id="player-list" class="player-list">
-        </div>
+    <div id="player-list" class="player-list"></div>
 </div>
 
 <div class="footer-actions">
-    <button class="btn-submit" onclick="submitRound()">LƯU VÁN ĐẤU</button>
-    <div class="sub-actions">
-        <button class="btn-sub" onclick="undo()">↩️ Hoàn tác</button>
-        <button class="btn-sub" onclick="openSettings()">⚙️ Cài đặt</button>
-        <button class="btn-sub" style="color:var(--accent-gold)" onclick="openChangeDealer()">🎩 Đổi Cái</button>
-        <button class="btn-sub" onclick="showHistory()">📜 Lịch sử</button>
-    </div>
+    <button class="btn-icon-footer" onclick="toggleTheme()">🌓</button>
+    <button class="btn-icon-footer" onclick="openSettings()">⚙️</button>
+    <button class="btn-submit" onclick="submitRound()">LƯU VÁN</button>
+    <button class="btn-icon-footer" onclick="undo()">↩️</button>
+    <button class="btn-icon-footer" onclick="showHistory()">📜</button>
 </div>
 
 <div id="settings-modal" class="modal">
     <div class="modal-content">
-        <h3>Quản lý bàn chơi</h3>
+        <h3 style="margin-top:0">Cài đặt bàn chơi</h3>
+        <button class="btn-mini" style="width:100%; margin-bottom:10px; background:var(--accent-gold); color:#000; font-weight:bold" onclick="openChangeDealer()">🎩 Đổi Người Làm Cái</button>
         <div id="settings-list"></div>
-        <button class="btn-sub" style="width:100%; margin-top:10px; background:var(--accent-blue); color:white;" onclick="addPlayer()">+ Thêm người</button>
-        <button class="btn-sub" style="width:100%; margin-top:10px;" onclick="closeModal('settings-modal')">Đóng</button>
-        <button class="btn-sub" style="width:100%; margin-top:10px; color:var(--accent-red)" onclick="resetGame()">🗑️ Reset Game</button>
+        <button class="btn-mini" style="width:100%; margin-top:10px; background:var(--accent-blue); color:white;" onclick="addPlayer()">+ Thêm người</button>
+        <button class="btn-mini" style="width:100%; margin-top:10px;" onclick="closeModal('settings-modal')">Đóng</button>
+        <div style="margin-top:15px; text-align:center;">
+             <a href="https://thanhnhut201294.github.io/ghidiem" style="color:#666; text-decoration:none; font-size:0.8rem;">🏠 Về trang chủ</a>
+        </div>
     </div>
 </div>
 
 <div id="dealer-modal" class="modal">
     <div class="modal-content">
-        <h3>Chọn Nhà Cái mới</h3>
-        <div id="dealer-select-list" style="display:flex; flex-direction:column; gap:10px; margin-top:15px;"></div>
-        <button class="btn-sub" style="width:100%; margin-top:15px;" onclick="closeModal('dealer-modal')">Hủy</button>
+        <h3 style="margin-top:0">Chọn Cái mới</h3>
+        <div id="dealer-select-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <button class="btn-mini" style="width:100%; margin-top:15px;" onclick="closeModal('dealer-modal')">Đóng</button>
     </div>
 </div>
 
 <div id="history-modal" class="modal">
     <div class="modal-content">
-        <h3>Lịch sử ván đấu</h3>
-        <div id="history-list" style="max-height: 300px; overflow-y: auto;"></div>
-        <button class="btn-sub" style="width:100%; margin-top:15px;" onclick="closeModal('history-modal')">Đóng</button>
+        <h3 style="margin-top:0">Lịch sử</h3>
+        <div id="history-list" style="max-height: 300px; overflow-y: auto; font-size:0.85rem;"></div>
+        <button class="btn-mini" style="width:100%; margin-top:10px;" onclick="closeModal('history-modal')">Đóng</button>
+        <button class="btn-mini" style="width:100%; margin-top:10px; color:var(--accent-red)" onclick="resetGame()">🗑️ Xóa hết dữ liệu</button>
     </div>
 </div>
 
-<div id="toast" class="toast">Đã lưu kết quả!</div>
+<div id="toast" class="toast">Đã lưu!</div>
 
 <script>
     // --- STATE ---
     let state = {
-        players: ['Người 1', 'Người 2', 'Người 3', 'Người 4', 'Người 5'], 
-        scores: [0, 0, 0, 0, 0],
-        bets: [10, 10, 10, 10, 10], 
-        isActive: [true, true, true, true, true],
+        players: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], // Test với 10 người
+        scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        bets: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10], 
+        isActive: [true, true, true, true, true, true, true, true, true, true],
         dealerIndex: 0, 
         history: [] 
     };
     
-    // Temp state for round inputs
-    let roundState = {}; // { index: { status: 'win'|'lose', x2: bool } }
+    let roundState = {}; 
 
     // --- INIT ---
     function init() {
-        const saved = localStorage.getItem('dealer_compact_v4');
+        const saved = localStorage.getItem('dealer_ultra_v5');
         if (saved) {
             const parsed = JSON.parse(saved);
             state = { ...state, ...parsed };
-            // Fix bet array if length mismatch
+            // Fix arrays length mismatch if players added/removed improperly before
             if (state.bets.length !== state.players.length) state.bets = state.players.map(()=>10);
+            if (state.isActive.length !== state.players.length) state.isActive = state.players.map(()=>true);
         }
         renderAll();
         checkTheme();
     }
 
-    // --- CORE RENDER ---
+    // --- RENDER ---
     function renderAll() {
         renderDealerHeader();
         renderPlayerList();
@@ -259,29 +253,28 @@
         const list = document.getElementById('player-list');
         list.innerHTML = '';
 
-        let hasActivePlayer = false;
-
         state.players.forEach((name, i) => {
-            if (i === state.dealerIndex) return; // Dealer is in header
+            if (i === state.dealerIndex) return; 
             
             const isActive = state.isActive[i];
             const score = state.scores[i];
             const bet = state.bets[i];
             const rState = roundState[i] || { status: null, x2: false };
-            
-            hasActivePlayer = true;
             const colorClass = score > 0 ? 'score-pos' : (score < 0 ? 'score-neg' : 'score-neutral');
 
             const card = document.createElement('div');
             card.className = `player-card ${!isActive ? 'paused' : ''}`;
             
-            // Generate HTML
-            let controlsHTML = '';
+            // HTML siêu gọn
             if (isActive) {
-                controlsHTML = `
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="p-name">${name}</div>
+                        <div class="p-score ${colorClass}">${score > 0 ? '+'+score : score}</div>
+                    </div>
                     <div class="card-controls">
-                        <div class="bet-area">
-                            Cược: <input type="number" class="bet-input" value="${bet}" onchange="updateBet(${i}, this.value)">
+                        <div class="bet-input-wrapper">
+                            <input type="number" class="bet-input" value="${bet}" onchange="updateBet(${i}, this.value)">
                         </div>
                         <div class="btn-group">
                             <button class="btn-act btn-x2 ${rState.x2 ? 'active' : ''}" onclick="toggleX2(${i})">x2</button>
@@ -291,26 +284,19 @@
                     </div>
                 `;
             } else {
-                controlsHTML = `<div style="text-align:center; font-size:0.8rem; color:#666; padding:5px;">Đang tạm nghỉ</div>`;
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="p-name">${name}</div>
+                        <div class="p-score score-neutral">${score}</div>
+                    </div>
+                    <div style="font-size:0.75rem; color:#666; text-align:center; padding:3px;">Tạm nghỉ</div>
+                `;
             }
-
-            card.innerHTML = `
-                <div class="card-header">
-                    <div class="p-name">${name}</div>
-                    <div class="p-score ${colorClass}">${score > 0 ? '+'+score : score}</div>
-                </div>
-                ${controlsHTML}
-            `;
             list.appendChild(card);
         });
-        
-        // Add extra padding at bottom so list isn't hidden by footer
-        const spacer = document.createElement('div');
-        spacer.style.height = '20px';
-        list.appendChild(spacer);
     }
 
-    // --- INTERACTION ---
+    // --- GAME LOGIC ---
     function updateBet(i, val) {
         state.bets[i] = parseFloat(val) || 0;
         saveState();
@@ -318,7 +304,6 @@
 
     function setStatus(i, status) {
         if (!roundState[i]) roundState[i] = { status: null, x2: false };
-        // Toggle
         if (roundState[i].status === status) roundState[i].status = null;
         else roundState[i].status = status;
         renderPlayerList();
@@ -350,17 +335,12 @@
                 state.scores[i] += change;
                 changes[i] = change;
                 playerSum += change;
-                
-                details.push({ name, change, x2: rState.x2 });
+                details.push({ n: name, c: change });
             }
         });
 
-        if (!hasAction) {
-            showToast("Chưa chọn Thắng/Thua!");
-            return;
-        }
+        if (!hasAction) { showToast("Chưa chọn!"); return; }
 
-        // Dealer Calculation
         const dealerChange = -playerSum;
         state.scores[state.dealerIndex] += dealerChange;
         changes[state.dealerIndex] = dealerChange;
@@ -368,12 +348,9 @@
         state.history.push({ dealerIndex: state.dealerIndex, changes, details });
         
         saveState();
-        roundState = {}; // Reset inputs
+        roundState = {};
         renderAll();
-        showToast("Đã cập nhật!");
-        
-        // Scroll to top to see dealer change? Optional.
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast("Đã lưu!");
     }
 
     function undo() {
@@ -383,113 +360,125 @@
         saveState(); renderAll(); showToast("Đã hoàn tác");
     }
 
-    // --- SETTINGS & MODALS ---
+    // --- SETTINGS (FIXED RE-RENDER BUG) ---
     function openSettings() {
+        renderSettingsList();
+        openModal('settings-modal');
+    }
+
+    function renderSettingsList() {
         const list = document.getElementById('settings-list');
         list.innerHTML = '';
         state.players.forEach((name, i) => {
             const div = document.createElement('div');
             div.className = 'setting-row';
             div.innerHTML = `
-                <div style="display:flex; flex-direction:column; gap:2px;">
-                    <button class="btn-icon-small" onclick="movePlayer(${i}, -1)">⬆️</button>
-                    <button class="btn-icon-small" onclick="movePlayer(${i}, 1)">⬇️</button>
-                </div>
-                <button class="btn-icon-small" style="width:40px; font-size:1.2rem; border:${state.isActive[i] ? '1px solid var(--accent-green)' : '1px solid #555'}" onclick="toggleActive(${i})">
+                <button class="btn-mini" onclick="movePlayer(${i}, -1)">⬆️</button>
+                <button class="btn-mini" onclick="movePlayer(${i}, 1)">⬇️</button>
+                <button class="btn-mini btn-status ${state.isActive[i] ? 'active' : ''}" onclick="toggleActive(${i})">
                     ${state.isActive[i] ? '🟢' : '⚫'}
                 </button>
-                <input type="text" class="setting-input" value="${name}" onchange="state.players[${i}] = this.value; saveState();">
-                <button class="btn-icon-small" style="background:var(--accent-red); color:white;" onclick="removePlayer(${i})">✕</button>
+                <input type="text" class="setting-input" value="${name}" onchange="updateName(${i}, this.value)">
+                <button class="btn-mini" style="background:var(--accent-red); color:white" onclick="removePlayer(${i})">✕</button>
             `;
             list.appendChild(div);
         });
-        openModal('settings-modal');
     }
 
-    function openChangeDealer() {
-        const list = document.getElementById('dealer-select-list');
-        list.innerHTML = state.players.map((n,i) => 
-            state.isActive[i] ? `<button class="btn-sub" style="text-align:left" onclick="changeDealer(${i})">${i===state.dealerIndex?'🎩 ':''} ${n}</button>` : ''
-        ).join('');
-        openModal('dealer-modal');
+    // --- FIX: ADD RENDER_ALL AFTER ACTIONS ---
+    function addPlayer() {
+        state.players.push(`Người ${state.players.length+1}`);
+        state.scores.push(0); state.bets.push(10); state.isActive.push(true);
+        saveState();
+        renderAll(); // Cập nhật màn hình chính
+        renderSettingsList(); // Cập nhật danh sách trong modal
     }
 
-    function showHistory() {
-        const list = document.getElementById('history-list');
-        const rev = [...state.history].reverse();
-        if (!rev.length) list.innerHTML = '<p style="text-align:center; color:#666">Chưa có lịch sử</p>';
-        else {
-            list.innerHTML = rev.map((h, i) => {
-                const num = state.history.length - i;
-                const dChange = h.changes[h.dealerIndex];
-                const dColor = dChange > 0 ? 'var(--accent-green)' : (dChange < 0 ? 'var(--accent-red)' : '#888');
-                
-                let dets = h.details ? h.details.map(d => {
-                     const c = d.change > 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-                     return `<span style="display:inline-block; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; margin:2px; font-size:0.75rem; color:${c}">${d.name}: ${d.change>0?'+':''}${d.change}</span>`;
-                }).join('') : '';
-
-                return `
-                    <div class="history-item">
-                        <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
-                            <span>#${num} - Cái: ${state.players[h.dealerIndex]||'Deleted'}</span>
-                            <span style="color:${dColor}">${dChange>0?'+':''}${dChange}</span>
-                        </div>
-                        <div>${dets}</div>
-                    </div>
-                `;
-            }).join('');
+    function removePlayer(i) {
+        if(state.players.length<=2 || i===state.dealerIndex) return alert("Không xóa được!");
+        if(confirm("Xóa?")) {
+            state.players.splice(i,1); state.scores.splice(i,1); state.bets.splice(i,1); state.isActive.splice(i,1);
+            if(state.dealerIndex>i) state.dealerIndex--;
+            saveState();
+            renderAll(); // FIX: Update main screen
+            renderSettingsList();
         }
-        openModal('history-modal');
     }
 
-    // --- LOGIC HELPERS ---
+    function toggleActive(i) {
+        if(i===state.dealerIndex) return alert("Đang làm Cái!");
+        state.isActive[i] = !state.isActive[i];
+        saveState();
+        renderAll(); // FIX
+        renderSettingsList();
+    }
+
     function movePlayer(idx, dir) {
         const nIdx = idx + dir;
         if (nIdx < 0 || nIdx >= state.players.length) return;
         swap(idx, nIdx);
         if (state.dealerIndex === idx) state.dealerIndex = nIdx;
         else if (state.dealerIndex === nIdx) state.dealerIndex = idx;
-        saveState(); renderAll(); openSettings();
+        saveState();
+        renderAll(); // FIX
+        renderSettingsList();
     }
+    
+    function updateName(i, val) {
+        state.players[i] = val;
+        saveState();
+        renderAll(); // FIX: Tên cập nhật ngay lập tức
+    }
+
     function swap(a, b) {
         [state.players[a], state.players[b]] = [state.players[b], state.players[a]];
         [state.scores[a], state.scores[b]] = [state.scores[b], state.scores[a]];
         [state.bets[a], state.bets[b]] = [state.bets[b], state.bets[a]];
         [state.isActive[a], state.isActive[b]] = [state.isActive[b], state.isActive[a]];
     }
-    function addPlayer() {
-        state.players.push(`Người ${state.players.length+1}`); state.scores.push(0); state.bets.push(10); state.isActive.push(true);
-        saveState(); openSettings();
+
+    function openChangeDealer() {
+        closeModal('settings-modal');
+        const list = document.getElementById('dealer-select-list');
+        list.innerHTML = state.players.map((n,i) => 
+            state.isActive[i] ? `<button class="btn-mini" style="width:100%; justify-content:flex-start; padding-left:10px" onclick="setDealer(${i})">${i===state.dealerIndex?'🎩 ':''} ${n}</button>` : ''
+        ).join('');
+        openModal('dealer-modal');
     }
-    function removePlayer(i) {
-        if(state.players.length<=2 || i===state.dealerIndex) return alert("Không thể xóa!");
-        if(confirm("Xóa người này?")) {
-            state.players.splice(i,1); state.scores.splice(i,1); state.bets.splice(i,1); state.isActive.splice(i,1);
-            if(state.dealerIndex>i) state.dealerIndex--;
-            saveState(); openSettings();
-        }
-    }
-    function toggleActive(i) {
-        if(i===state.dealerIndex) return alert("Không thể nghỉ khi đang làm Cái");
-        state.isActive[i] = !state.isActive[i]; saveState(); openSettings();
-    }
-    function changeDealer(i) {
-        state.dealerIndex = i; closeModal('dealer-modal'); saveState(); renderAll(); showToast("Đã đổi Cái");
+    function setDealer(i) { 
+        state.dealerIndex = i; closeModal('dealer-modal'); saveState(); renderAll(); showToast("Đã đổi Cái"); 
     }
     function resetGame() {
-        if(confirm("Chơi lại từ đầu?")) {
-            state.scores = state.players.map(()=>0); state.history=[]; saveState(); renderAll(); closeModal('settings-modal');
+        if(confirm("Xóa hết?")) {
+            state.scores = state.players.map(()=>0); state.history=[]; saveState(); renderAll(); closeModal('history-modal'); closeModal('settings-modal');
         }
     }
+    function showHistory() {
+        const list = document.getElementById('history-list');
+        const rev = [...state.history].reverse();
+        if (!rev.length) list.innerHTML = '<p style="text-align:center; color:#666">Trống</p>';
+        else {
+            list.innerHTML = rev.map((h, i) => {
+                const num = state.history.length - i;
+                const dChange = h.changes[h.dealerIndex];
+                const dColor = dChange > 0 ? 'var(--accent-green)' : (dChange < 0 ? 'var(--accent-red)' : '#888');
+                let det = h.details ? h.details.map(d=>`<span style="margin-right:5px; color:${d.c>0?'var(--accent-green)':'var(--accent-red)'}">${d.n} ${d.c>0?'+':''}${d.c}</span>`).join('') : '';
+                return `<div style="padding:5px; border-bottom:1px solid #333; margin-bottom:5px;">
+                    <div style="font-weight:bold">#${num} Cái: <span style="color:${dColor}">${dChange>0?'+':''}${dChange}</span></div>
+                    <div style="font-size:0.8rem; color:#888">${det}</div>
+                </div>`;
+            }).join('');
+        }
+        openModal('history-modal');
+    }
 
-    // --- UI HELPERS ---
+    // --- UTILS ---
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function saveState() { localStorage.setItem('dealer_compact_v4', JSON.stringify(state)); }
+    function saveState() { localStorage.setItem('dealer_ultra_v5', JSON.stringify(state)); }
     function toggleTheme() { document.body.classList.toggle('light-mode'); }
     function checkTheme() {}
-    function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+    function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
 
     document.addEventListener('DOMContentLoaded', init);
 </script>
